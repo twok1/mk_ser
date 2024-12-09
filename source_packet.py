@@ -43,10 +43,26 @@ class SourcePacket:
         pass
 
 
-s = SourcePacket()
-s.dsap = 119
-s.collect_eth_title()
+def adr_from_list(list):
+    return sum([100 ** (4 - num) * i for num, i in enumerate(list)])
 
-packet = Ether(s._eth_title)
-packet.show()
-print(hexdump(packet))
+def get_addresses(data):
+    dst = adr_from_list(data[1:6])
+    src = adr_from_list(data[7:12])
+    data_raw = data[17:]
+    return dst, src, data_raw
+
+def mks_telegram(data):
+    print(data)
+    time_a, time_b = data[7:9], data[9:11]
+    print(bytes_bin(time_a), bytes_bin(time_b))
+
+def bytes_bin(data):
+    return ''.join(map(lambda x: bin(x).lstrip('0b'), data))
+
+
+packet_list = [2, 0, 0, 0, 7, 99, 2, 0, 0, 0, 1, 19, 0, 30, 80, 80, 231, 239, 25, 210, 0, 17, 0, 101, 51, 122, 160, 111, 15, 254, 0, 0, 0, 0, 0, 0, 192, 6, 192, 0, 192, 6, 17, 4, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136]
+dst, src, data_raw = get_addresses(packet_list)
+opc = data_raw[2]
+if opc == 210:
+    mks_telegram(data_raw)

@@ -128,17 +128,17 @@ def serialize_telegrams(telegram):
 
 
 def my_sniffer():
-    capture = sniff(count=1)
-    for packet in capture:
-        if Raw in packet:
-            print(list(bytes(packet[Raw])))
+    # capture = sniff(count=1)
+    # for packet in capture:
+    #     if Raw in packet:
+    #         print(list(bytes(packet[Raw])))
 
-    # a = rdpcap('traff\\119-mks6,7,8..0-1.pcapng')
-    # for num, packet in enumerate(a):
-    #     if num == 237:
-    #         print(num, list(raw(packet)))
-    #         dsap = get_dsap(packet)
-    #         print(dsap)
+    a = rdpcap('traff\\119-mks6,7,8..0-1.pcapng')
+    for num, packet in enumerate(a):
+        if num == 962:
+            print(num, list(raw(packet)))
+            dsap = get_dsap(packet)
+            print(dsap)
 
 
 def get_dsap(packet):
