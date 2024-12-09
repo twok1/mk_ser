@@ -90,8 +90,6 @@ class MkeTelegram:
         self._data = b'\xef' + itb(len(telegram)) + telegram
 
 
-
-
 def itb(num: int) -> bytes:
     """преобразует int в bytes"""
     return bytes([num])
@@ -132,8 +130,22 @@ def serialize_telegrams(telegram):
 def my_sniffer():
     capture = sniff(count=1)
     for packet in capture:
-        print(packet[Raw].show())
-    # hexedit()
+        if Raw in packet:
+            print(list(bytes(packet[Raw])))
+
+    # a = rdpcap('traff\\119-mks6,7,8..0-1.pcapng')
+    # for num, packet in enumerate(a):
+    #     if num == 237:
+    #         print(num, list(raw(packet)))
+    #         dsap = get_dsap(packet)
+    #         print(dsap)
+
+
+def get_dsap(packet):
+    packet = list(bytes(packet))
+    dsap = int(''.join([str(i) for i in packet[1:6] if i]))
+    ssap = int(''.join([str(i) for i in packet[7:12] if i]))
+    return dsap, ssap
 
 
 def main():
