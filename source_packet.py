@@ -1,9 +1,9 @@
 import socket
 from scapy.all import *
 from scapy.all import Ether, LLC
+from bitstring import BitArray
 
 MY_ADDRESS = 177
-
 
 class SourcePacket:
     def __init__(self, ssap=MY_ADDRESS):
@@ -52,17 +52,36 @@ def get_addresses(data):
     data_raw = data[17:]
     return dst, src, data_raw
 
+def byte_to_bit(byte):
+    return BitArray(uint=byte, length=8)
+
+def word_to_bit(word):
+    return BitArray(uint=word, length=16)
+
 def mks_telegram(data):
     print(data)
     time_a, time_b = data[7:9], data[9:11]
+    # print(bytes_bin(time_a), bytes_bin(time_b))
+    q_data_a = data[11:13]
+    q_data_b = data[13:15]
     print(bytes_bin(time_a), bytes_bin(time_b))
+    print(bytes_bin(q_data_a), bytes_bin(q_data_b))
 
-def bytes_bin(data):
+def bytes_bin(data, max_len=None) -> str:
+    result = ''.join(map(lambda x: bin(x).lstrip('0b'), data))
+    while len(result) % 8:
+        result = f'0{result}'
+    return result
+
+def bytes_bin_list(data) -> str:
     return ''.join(map(lambda x: bin(x).lstrip('0b'), data))
 
+a = rdpcap('traff\\119-mks6,7,8..0-1.pcapng')
 
-packet_list = [2, 0, 0, 0, 7, 99, 2, 0, 0, 0, 1, 19, 0, 30, 80, 80, 231, 239, 25, 210, 0, 17, 0, 101, 51, 122, 160, 111, 15, 254, 0, 0, 0, 0, 0, 0, 192, 6, 192, 0, 192, 6, 17, 4, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136, 136]
-dst, src, data_raw = get_addresses(packet_list)
-opc = data_raw[2]
-if opc == 210:
-    mks_telegram(data_raw)
+for num, pack in enumerate(a):
+        packet = list(raw(pack))
+        dst, src, data_raw = get_addresses(packet)
+        opc = data_raw[2]
+        if opc == 210:
+            print(num, packet)
+            mks_telegram(data_raw)
